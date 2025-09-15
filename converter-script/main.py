@@ -16,15 +16,15 @@ logger = logging.getLogger(__name__)
 def main():
     """Main entry point"""
     consumer = ConversionConsumer()
-    
+
     try:
         consumer.run()
     except KeyboardInterrupt:
-      logger.info("Shutting down...")
-    except Exception as e:
-      logger.error(f"Fatal error: {e}")
-      logger.error(traceback.format_exc())
-      sys.exit(1)
+        logger.info("Shutting down...")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Fatal error: %s", e)
+        logger.error(traceback.format_exc())
+        sys.exit(1)
 
 
 if __name__ == "__main__":

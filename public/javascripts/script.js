@@ -6,7 +6,6 @@ function initProgressTracker(progressUrl, { onProgress, onSuccess, onError }) {
 
   eventSource.onerror = (event) => {
     console.error("EventSource error:", event);
-    onError(event);
   };
 
   eventSource.addEventListener("heartbeat", (event) => {
@@ -205,6 +204,7 @@ class FileUploader {
           },
           onError: (data) => {
             console.log("Error received:", data);
+            this.showError("Failed to convert file. Please try again.");
           },
         });
       } else {
