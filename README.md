@@ -5,7 +5,6 @@
 Create a `.env` file in the project root with the following variables:
 
 ```env
-# RabbitMQ Configuration
 RABBITMQ_USER=admin
 RABBITMQ_PASS=password
 RABBITMQ_HOST=rabbitmq
