@@ -1,0 +1,16 @@
+# Ignore node_modules. We'll install them inside the container.
+node_modules
+
+# Ignore logs
+npm-debug.log
+
+# Git files
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose.yml
+
+# Uploads directory
+uploads

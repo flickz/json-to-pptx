@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      # This volume is for live-reloading our code
+      - .:/usr/src/app
+      # This anonymous volume is to prevent the host node_modules from overwriting the container's
+      - /usr/src/app/node_modules
+      # This named volume is for sharing files (uploads/outputs) with other services
+      - shared_data:/usr/src/app/shared
+    environment:
+      - NODE_ENV=development
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      - REDIS_URL=redis://redis:6379
+    # This ensures rabbitmq and redis start before our app
+    depends_on:
+      - rabbitmq
+      - redis
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      # Port for application connection
+      - "5672:5672"
+      # Port for the management UI (accessible at http://localhost:15672)
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
+
+  converter:
+    build: ./converter-script
+    volumes:
+      # Share the uploads and outputs directories
+      - shared_data:/app/shared
+      # Mount the converter script for development (optional)
+      - ./converter-script:/app
+    environment:
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      - REDIS_URL=redis://redis:6379
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - rabbitmq
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      # Optional: persist Redis data
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+# Define the named volumes
+volumes:
+  shared_data:
+  redis_data:
